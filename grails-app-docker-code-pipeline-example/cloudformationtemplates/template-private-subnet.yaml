@@ -7,11 +7,15 @@ Parameters:
     Type: String
     Default: grails-app
     Description: Name for the project (lower case)
-  ContainerImageUrl:
+  WebContainerImageUrl:
     Type: String
     Default: not-set
-    Description: Container image url
-             
+    Description: nginx Container image url
+  AppContainerImageUrl:
+    Type: String
+    Default: not-set
+    Description: App Container image url            
+
 Mappings:
   SubnetConfig:
     VPC:
@@ -347,9 +351,19 @@ Resources:
       TaskRoleArn: !Ref TaskRole
       ContainerDefinitions:
         - Name: !Sub '${ProjectName}-web'
-          Image: !Ref ContainerImageUrl
+          Image: !Ref WebContainerImageUrl
           PortMappings:
             - ContainerPort: 80
+          Links:
+            - !Sub '${ProjectName}-app'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: ecs
+        - Name: !Sub '${ProjectName}-app'
+          Image: !Ref AppContainerImageUrl
           LogConfiguration:
             LogDriver: awslogs
             Options:
