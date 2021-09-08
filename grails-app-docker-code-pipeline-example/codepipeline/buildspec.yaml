@@ -19,10 +19,10 @@ phases:
 
   build:
     commands:
-      - docker build -t ${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}  ./grails-app-docker-code-pipeline-example/app/
+      - docker build -t ${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} . --file ./grails-app-docker-code-pipeline-example/app/dockerfile
       - docker tag ${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
 
-      - docker build -t ${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}  ./grails-app-docker-code-pipeline-example/nginx/
+      - docker build -t ${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} . --file ./grails-app-docker-code-pipeline-example/nginx/Dockerfile
       - docker tag ${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
 
   post_build:
