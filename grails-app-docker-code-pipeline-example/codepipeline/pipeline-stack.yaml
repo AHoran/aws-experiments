@@ -332,7 +332,7 @@ Resources:
                     Provider: GitHub
                     Version: '1'
                   Configuration:
-                    Owner: Adipa-G
+                    Owner: ahoran
                     Repo: aws-experiments
                     Branch: master
                     OAuthToken:  "{{resolve:secretsmanager:github-pat-token:SecretString:token}}"
