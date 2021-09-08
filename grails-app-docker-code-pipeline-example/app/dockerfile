@@ -5,7 +5,7 @@ RUN export SDKMAN_DIR=/home/sdkman \
 	&& chmod 777 ./home/sdkman/bin/sdkman-init.sh \
 	&& yes | /bin/bash -l -c 'sdk install grails 2.5.4' \
 	&& yes | /bin/bash -l -c 'sdk install groovy 2.4.5'
-COPY . /home/app
+COPY ./grails-app-docker-code-pipeline-example/app /home/app
 RUN /bin/bash -l -c 'cd /home/app && grails clean-all' \
 	&& /bin/bash -l -c 'cd /home/app && grails compile' \
 	&& /bin/bash -l -c 'cd /home/app && grails war' 

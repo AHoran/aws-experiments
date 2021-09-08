@@ -1,2 +1,2 @@
 FROM nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ./grails-app-docker-code-pipeline-example/nginx/nginx.conf /etc/nginx/nginx.conf
