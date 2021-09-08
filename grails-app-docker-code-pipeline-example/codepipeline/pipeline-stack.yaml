@@ -176,10 +176,10 @@ Resources:
         - Key: Project
           Value: !Ref ProjectName
   
-  PipelineECRRepository:
+  PipelineAppECRRepository:
     Type: AWS::ECR::Repository
     Properties: 
-      RepositoryName: !Sub '${ProjectName}.ecr'
+      RepositoryName: !Sub 'app-${ProjectName}.ecr'
       RepositoryPolicyText: 
         Version: '2008-10-17'
         Statement:
@@ -190,7 +190,22 @@ Resources:
             - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
           Action:
           - ecr:*
-        
+
+  PipelineWebECRRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub 'web-${ProjectName}.ecr'
+      RepositoryPolicyText: 
+        Version: '2008-10-17'
+        Statement:
+        - Sid: AllowPushPull
+          Effect: Allow
+          Principal:
+            AWS:
+            - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+          Action:
+          - ecr:*
+
   PipelineRole:
     Type: AWS::IAM::Role
     DependsOn:
@@ -276,8 +291,10 @@ Resources:
             Value: !Sub ${AWS::Region}
           - Name: AWS_ACCOUNT_ID
             Value: !Sub ${AWS::AccountId}
-          - Name: IMAGE_REPO_NAME
-            Value: !Sub '${ProjectName}.ecr'
+          - Name: WEB_IMAGE_REPO_NAME
+            Value: !Sub 'web-${ProjectName}.ecr'
+          - Name: APP_IMAGE_REPO_NAME
+            Value: !Sub 'app-${ProjectName}.ecr'            
         PrivilegedMode: true
       ServiceRole: !GetAtt PipelineRole.Arn
       Source: 
@@ -393,7 +410,8 @@ Resources:
                     ParameterOverrides: !Sub |
                       { 
                         "ProjectName" : "${ProjectName}",
-                        "ContainerImageUrl" : "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ProjectName}.ecr:#{BuildVariables.CODEBUILD_BUILD_NUMBER}"
+                        "WebContainerImageUrl" : "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/web-${ProjectName}.ecr:#{BuildVariables.CODEBUILD_BUILD_NUMBER}",
+                        "AppContainerImageUrl" : "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/app-${ProjectName}.ecr:#{BuildVariables.CODEBUILD_BUILD_NUMBER}"
                       }
                   InputArtifacts:
                     - Name: OutputArtefact

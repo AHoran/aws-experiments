@@ -11,21 +11,25 @@ phases:
       - echo ${AWS_REGION}
       - echo ${CODEBUILD_BUILD_NUMBER}
       - echo ${CODEBUILD_SRC_DIR}
-      - echo ${IMAGE_REPO_NAME}
+      - echo ${WEB_IMAGE_REPO_NAME}
+      - echo ${APP_IMAGE_REPO_NAME}      
       
       - apt-get upgrade
       - apt-get update
 
   build:
     commands:
+      - docker build -t ${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} . --file ./grails-app-docker-code-pipeline-example/app/dockerfile
+      - docker tag ${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
 
-      - docker build -t ${IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} . --file ./grails-app-docker-code-pipeline-example/dockerfile
-      - docker tag ${IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
+      - docker build -t ${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} . --file ./grails-app-docker-code-pipeline-example/nginx/dockerfile
+      - docker tag ${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
 
   post_build:
     commands:
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${WEB_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP_IMAGE_REPO_NAME}:${CODEBUILD_BUILD_NUMBER}
       
 artifacts:    
   files:
