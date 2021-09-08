@@ -354,8 +354,6 @@ Resources:
           Image: !Ref WebContainerImageUrl
           PortMappings:
             - ContainerPort: 80
-          Links:
-            - !Sub '${ProjectName}-app'
           LogConfiguration:
             LogDriver: awslogs
             Options:
